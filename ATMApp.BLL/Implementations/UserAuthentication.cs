@@ -10,15 +10,25 @@ namespace ATMApp
 {
     public class UserAuthentication
     {
-        ATMUsersChoice usersChoice = new ATMUsersChoice();
-        SelectQuery selectQuery = new SelectQuery(new ATMDBContext());
+        private readonly ATMUsersChoice _usersChoice;
+        private readonly SelectQuery _selectQuery;
         public static CustomerLoginViewModel user = new CustomerLoginViewModel();
-        ATMService loginAtmService = new ATMService(new ATMDBContext());
 
-        public static Account LoggedInUser {get; set;}
+        private readonly ATMDBContext context;
+        private readonly IATMService atmService;
+
+        public UserAuthentication(ATMDBContext context, IATMService atmService)
+        {
+            this.context = context;
+            this.atmService = atmService;
+            _usersChoice = new ATMUsersChoice(atmService);
+            _selectQuery = new SelectQuery(context);
+        }
+
+        public static Account LoggedInUser { get; set; }
         public async Task LoginAsync()
         {
-            
+
             Console.WriteLine("Welcome to Bank of the Rich");
 
             Console.WriteLine("Enter your card number (10 digits only):");
@@ -28,19 +38,18 @@ namespace ATMApp
 
             if (userCardNo.Count() == 10 && Userpin.Count() == 4)
             {
-                //user.CardNo = userCardNo;
-                //user.Pin = Userpin;
 
-                string dbQuery = @"USE LynnAtmDB; SELECT * FROM CustomerAccount WHERE CardNumber = @CardNumber AND Pin = @Pin";
-                var user = await selectQuery.SelectCustomerAsync(userCardNo, Userpin, dbQuery);
+
+
+                var user = await _selectQuery.SelectCustomerAsync(userCardNo, Userpin);
 
                 var userDetails = user.FirstOrDefault(user => user.CardNumber == userCardNo && user.Pin == Userpin);
-                
-                if(userDetails != null)
+
+                if (userDetails != null)
                 {
                     LoggedInUser = userDetails;
                     Console.WriteLine($"Welcome {userDetails.FullName}");
-                    usersChoice.GetUserChoice();
+                    await _usersChoice.GetUserChoice();
 
                 }
             }
@@ -49,6 +58,10 @@ namespace ATMApp
                 Console.WriteLine("Card number should not be less than or more than 10 digits\npin should not be more than or less than 4");
                 await LoginAsync();
             }
+
+
+
+
         }
 
         public async Task EnrollAsync()
@@ -68,8 +81,9 @@ namespace ATMApp
                 CardNo = cardNo,
                 Pin = pin
             };
-            await loginAtmService.EnrollCustomerAsync(model);
+            await atmService.EnrollCustomerAsync(model);
         }
+
 
     }
 }

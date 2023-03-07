@@ -7,9 +7,9 @@ namespace ATMApp.DAL
     {
        
         Task EnrollCustomerAsync(CustomerViewModel model);
-        
-        void Withdraw(WithdrawViewModel model);
-        void Transfer(TransferViewModel model);
+
+        Task Withdraw();
+        Task Transfer();
         Task CheckBalance();
         void Exit();
     }

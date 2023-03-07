@@ -15,7 +15,7 @@ namespace ATMApp.BLL.Utilities
             {
                 Console.WriteLine("Input was empty");
                 AccountNumber();
-                
+
             }
             return accountNumber;
         }

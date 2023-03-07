@@ -12,7 +12,7 @@ namespace ATMApp.BLL.Utilities
             byte[] randomNumber = new byte[1];
             RNGCryptoServiceProvider rngCsp = new RNGCryptoServiceProvider();
 
-            // Generate 10 random digits
+
             for (int i = 0; i < 10; i++)
             {
                 rngCsp.GetBytes(randomNumber);

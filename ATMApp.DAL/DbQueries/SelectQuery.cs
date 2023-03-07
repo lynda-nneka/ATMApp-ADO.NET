@@ -10,20 +10,23 @@ namespace ATMApp.DAL.DbQueries
     public class SelectQuery
     {
 
-        ATMDBContext _dbContext = new ATMDBContext();
+        private readonly ATMDBContext _dbContext;
         public SelectQuery(ATMDBContext dbContext)
         {
-            _dbContext = dbContext; 
+            _dbContext = dbContext;
         }
 
-        public async Task<IEnumerable<Account>> SelectCustomerAsync(string accountNumber, string queryString)
+        public async Task<IEnumerable<Account>> SelectCustomerAsync(string accountNumber)
         {
+            string query =
+               $"USE LynnAtmDB; SELECT * FROM CustomerAccount where AccountNumber = @AccountNumber";
+
             IList<Account> accounts = new List<Account>();
             try
             {
                 using SqlConnection sqlConn = await _dbContext.OpenConnection();
 
-                 using SqlCommand command = new SqlCommand(queryString, sqlConn);
+                using SqlCommand command = new SqlCommand(query, sqlConn);
 
                 command.Parameters.AddWithValue("@AccountNumber", accountNumber);
 
@@ -45,24 +48,26 @@ namespace ATMApp.DAL.DbQueries
                     });
                 }
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 throw e;
             }
-            
+
             return accounts;
 
-            
+
         }
 
-        public async Task<IEnumerable<Account>> SelectCustomerAsync(string cardNumber, string pin, string queryString)
+        public async Task<IEnumerable<Account>> SelectCustomerAsync(string cardNumber, string pin)
         {
+            string dbQuery = @"USE LynnAtmDB; SELECT * FROM CustomerAccount WHERE CardNumber = @CardNumber AND Pin = @Pin";
+
             IList<Account> accounts = new List<Account>();
             try
             {
                 SqlConnection sqlConn = await _dbContext.OpenConnection();
 
-                using SqlCommand command = new SqlCommand(queryString, sqlConn);
+                using SqlCommand command = new SqlCommand(dbQuery, sqlConn);
 
                 command.Parameters.AddWithValue("@CardNumber", cardNumber);
                 command.Parameters.AddWithValue("@Pin", pin);
@@ -85,11 +90,11 @@ namespace ATMApp.DAL.DbQueries
                     });
                 }
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 throw e;
             }
-            
+
             return accounts;
 
 
